@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-test
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: k8s-test
+  template:
+    metadata:
+      labels:
+        app: k8s-test-app
+    spec:
+      containers:
+        - image: nginx:not-real-label
+          name: web
+          ports:
+            - containerPort: 80
+              name: http
+          resources:
+            limits:
+              cpu: "32"            
+              memory: "128Gi"
+          readinessProbe:
+            tcpSocket:
+              port: 8020
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthy
+              port: 80
+            periodSeconds: 30
+            failureThreshold: 1
